@@ -2,7 +2,7 @@
 # Minimal SquashFS 4.0 extractor for Atheros "lzma adaptive" (5-byte header) blocks.
 import struct, lzma, os, sys, stat
 
-IMG = sys.argv[1] if len(sys.argv)>1 else '/Volumes/MacEXT/code/logitechharmonyhub/backups/mtd3.bin'
+IMG = sys.argv[1] if len(sys.argv)>1 else 'backups/mtd3.bin'
 OUT = sys.argv[2] if len(sys.argv)>2 else '/tmp/harmony_rootfs'
 d = open(IMG,'rb').read()
 
