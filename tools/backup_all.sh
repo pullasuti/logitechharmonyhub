@@ -1,7 +1,7 @@
 #!/bin/zsh
 # Dump every MTD partition over the console (RLE+base64 via /tmp/r.lua),
 # decode on the host, and verify each against the device's reference md5.
-cd /Volumes/MacEXT/code/logitechharmonyhub
+REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 
 typeset -A ref to
 ref[0]=eb99f5aaaced4ad73ddecfc7d8650374   # u-boot
@@ -18,8 +18,8 @@ fail=0
 for n in 0 1 2 3 4 5 6; do
   dev=/dev/mtd$n; out=backups/mtd${n}.bin
   echo "[$(date +%H:%M:%S)] dumping mtd$n (timeout ${to[$n]}s) ..."
-  python3 uartctl.py send "lua /tmp/r.lua $dev"
-  if ! python3 uartctl.py wait "===RLE64END $dev rawbytes=[0-9]+===" ${to[$n]} >/dev/null 2>&1; then
+  python3 tools/uartctl.py send "lua /tmp/r.lua $dev"
+  if ! python3 tools/uartctl.py wait "===RLE64END $dev rawbytes=[0-9]+===" ${to[$n]} >/dev/null 2>&1; then
     echo "[$(date +%H:%M:%S)] mtd$n WAIT TIMEOUT"; fail=1; continue
   fi
   python3 tools/extract_rle64.py /tmp/uart-latest.log $dev $out >/tmp/extract_mtd$n.txt 2>&1
