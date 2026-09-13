@@ -32,7 +32,7 @@ import os, sys, json, time, signal, base64, re, fcntl, errno
 
 STATE = "/tmp/uartctl.state.json"
 DAEMON_ERR = "/tmp/uartctl.daemon.err"
-DEFAULT_PORT = "/dev/cu.usbserial-A50285BI"
+DEFAULT_PORT = "/dev/ttyUSB0"
 DEFAULT_BAUD = 115200
 DEFAULT_TERM = "\r"   # CR; embedded consoles usually map CR->NL
 
