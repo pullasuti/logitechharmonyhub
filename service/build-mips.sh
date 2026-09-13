@@ -19,15 +19,25 @@
 # link-self-contained=yes + relocation-model=static + -no-pie. A one-time shim aliases
 # libgcc_s -> libunwind.a (panic=abort means it's unused) to satisfy the -lgcc_s ref.
 set -e
+
+# Script's own directory — all crate paths resolve relative to this
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CRATE="${1:-.}"
+
+# If a crate name was provided (e.g., "irapi"), resolve it under SCRIPT_DIR
+if [ "$CRATE" != "." ] && [[ ! "$CRATE" = /* ]]; then
+    CRATE="$SCRIPT_DIR/$CRATE"
+fi
+
 TC=$(echo ~/.rustup/toolchains/1.74.0-*)
+HOST=$(rustc --version --verbose | sed -n 's/^host: //p')
 SC="$TC/lib/rustlib/mips-unknown-linux-musl/lib/self-contained"
 mkdir -p /tmp/mipslibs && cp -f "$SC/libunwind.a" /tmp/mipslibs/libgcc_s.a
-export PATH="$TC/bin:$PATH"
+export PATH="$TC/bin:$TC/lib/rustlib/$HOST/bin:$PATH"
 cd "$CRATE"
 cargo build --release --target mips-unknown-linux-musl
 BIN=$(ls -1 target/mips-unknown-linux-musl/release/ | grep -vE '\.|^build$|^deps$|^incremental$|^examples$' | head -1)
 P="target/mips-unknown-linux-musl/release/$BIN"
 echo "=== $P ==="
 file "$P"
-echo "size: $(stat -f%z "$P") bytes"
+echo "size: $(stat -c%s "$P") bytes"
